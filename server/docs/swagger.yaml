@@ -1,0 +1,391 @@
+openapi: 3.0.0
+info:
+  title: Final Project API
+  version: 1.0.0
+  description: API documentation for Final Project (Sourav)
+
+servers:
+  - url: http://localhost:6900
+
+tags:
+  - name: Auth
+    description: Authentication APIs
+  - name: Provider
+    description: Provider APIs
+  - name: Booking
+    description: Booking APIs
+  - name: Review
+    description: Review APIs
+  - name: Analytics
+    description: Analytics APIs
+
+# 🔐 Apply security globally to all routes
+security:
+  - bearerAuth: []
+
+paths:
+  # ---------- auth routes ----------
+  /api/auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      security: [] # No auth needed for register
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                profilePic:
+                  type: string
+                  format: binary
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        201:
+          description: User created
+
+  /api/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: User login
+      security: [] # No auth needed for login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: Login successful
+
+  /api/auth/logout:
+    get:
+      tags:
+        - Auth
+      summary: Log out user
+      responses:
+        200:
+          description: User logged out
+
+  /api/auth/profile:
+    get:
+      tags:
+        - Auth
+      summary: Get user profile
+      responses:
+        200:
+          description: Profile data returned
+
+    patch:
+      tags:
+        - Auth
+      summary: Edit user profile
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                profilePic:
+                  type: string
+                  format: binary
+                name:
+                  type: string
+                email:
+                  type: string
+      responses:
+        200:
+          description: Profile updated
+
+  /api/auth/forget-password:
+    post:
+      tags:
+        - Auth
+      summary: Request password reset
+      security: [] # No auth needed for forget-password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+      responses:
+        200:
+          description: Email sent for reset
+
+  /api/auth/reset-password/{token}:
+    post:
+      tags:
+        - Auth
+      summary: Reset password using token
+      security: [] # No auth needed for reset via email link
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newPassword:
+                  type: string
+      responses:
+        200:
+          description: Password reset successful
+
+  /api/auth/reset-password:
+    patch:
+      tags:
+        - Auth
+      summary: Reset password for logged in user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPassword:
+                  type: string
+                newPassword:
+                  type: string
+      responses:
+        200:
+          description: Password updated
+
+  #-------- provider section -------
+  /api/providers:
+    get:
+      tags:
+        - Provider
+      summary: Get all providers
+      responses:
+        200:
+          description: List of providers
+
+    post:
+      tags:
+        - Provider
+      summary: Create or update provider profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bio:
+                  type: string
+                services:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        201:
+          description: Provider created
+
+  /api/providers/user/{userId}:
+    get:
+      tags:
+        - Provider
+      summary: Get provider by user ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Provider info
+
+  /api/providers/{id}:
+    get:
+      tags:
+        - Provider
+      summary: Get provider by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Provider info
+
+  # -------------Bookings---------
+  /api/bookings:
+    post:
+      tags:
+        - Booking
+      summary: Create a booking
+      responses:
+        201:
+          description: Booking created
+
+  /api/bookings/provider/{providerId}:
+    get:
+      tags:
+        - Booking
+      summary: Get booked slots for provider
+      parameters:
+        - name: providerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Slots list
+
+  /api/bookings/user/{userId}:
+    get:
+      tags:
+        - Booking
+      summary: Get bookings for a user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Bookings list
+
+  /api/bookings/provider/{providerId}/all:
+    get:
+      tags:
+        - Booking
+      summary: Get all bookings for a provider
+      parameters:
+        - name: providerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Bookings list
+
+  /api/bookings/status/{bookingId}:
+    patch:
+      tags:
+        - Booking
+      summary: Update booking status
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - confirmed
+                    - cancelled
+                    - completed
+      responses:
+        200:
+          description: Booking status updated
+
+  # ------------ reviews ----------
+  /api/reviews:
+    post:
+      tags:
+        - Review
+      summary: Create or update review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                providerId:
+                  type: string
+                rating:
+                  type: number
+                comment:
+                  type: string
+      responses:
+        201:
+          description: Review saved
+
+  /api/reviews/user/{userId}:
+    get:
+      tags:
+        - Review
+      summary: Get reviews by user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: User reviews list
+
+  /api/reviews/{providerId}:
+    get:
+      tags:
+        - Review
+      summary: Get reviews for a provider
+      parameters:
+        - name: providerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Provider reviews list
+
+  # ---------- analytics ----------
+  /api/analytics:
+    get:
+      tags:
+        - Analytics
+      summary: Get analytics data
+      responses:
+        200:
+          description: Analytics data returned
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

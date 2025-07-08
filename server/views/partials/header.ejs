@@ -1,0 +1,184 @@
+<nav
+  class="bg-gradient-to-r from-indigo-800 to-indigo-700 text-white shadow-md"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo and main navigation -->
+      <div class="flex items-center space-x-4 md:space-x-8">
+        <a href="/admin" class="flex items-center space-x-2 md:space-x-3">
+          <i class="fas fa-cogs text-xl md:text-2xl text-indigo-200"></i>
+          <span
+            class="text-lg md:text-xl font-semibold tracking-tight hidden md:inline-block"
+          >
+            ServeHub Admin
+          </span>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex space-x-6">
+          <a href="/admin" class="nav-link group relative py-1 px-1">
+            <i class="fas fa-tachometer-alt mr-2 text-indigo-200"></i>
+            Dashboard
+            <span
+              class="nav-underline absolute bottom-0 left-0 h-0.5 bg-white transition-all duration-300 w-0 group-hover:w-full"
+            ></span>
+          </a>
+          <a href="/admin/users" class="nav-link group relative py-1 px-1">
+            <i class="fas fa-users mr-2 text-indigo-200"></i>
+            Users
+            <span
+              class="nav-underline absolute bottom-0 left-0 h-0.5 bg-white transition-all duration-300 w-0 group-hover:w-full"
+            ></span>
+          </a>
+          <a href="/admin/bookings" class="nav-link group relative py-1 px-1">
+            <i class="fas fa-calendar-check mr-2 text-indigo-200"></i>
+            Bookings
+            <span
+              class="nav-underline absolute bottom-0 left-0 h-0.5 bg-white transition-all duration-300 w-0 group-hover:w-full"
+            ></span>
+          </a>
+          <a href="/admin/reviews" class="nav-link group relative py-1 px-1">
+            <i class="fas fa-star mr-2 text-indigo-200"></i>
+            Reviews
+            <span
+              class="nav-underline absolute bottom-0 left-0 h-0.5 bg-white transition-all duration-300 w-0 group-hover:w-full"
+            ></span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right side elements -->
+      <div class="flex items-center space-x-4 md:space-x-6">
+        <% if (admin) { %>
+        <div class="flex items-center space-x-2 md:space-x-3">
+          <img
+            src="/uploads/profilePics/<%= admin.profilePic || 'default.png' %>"
+            onerror="this.src='/uploads/profilePics/default.png'"
+            class="w-7 h-7 md:w-8 md:h-8 rounded-full object-cover border-2 border-indigo-200"
+            alt="Admin Profile"
+          />
+          <span
+            class="hidden lg:inline-block font-medium text-sm text-indigo-100"
+          >
+            <%= admin.name %>
+          </span>
+        </div>
+        <% } %>
+
+        <!-- Logout - visible on all screens -->
+        <a
+          href="/admin/logout"
+          class="flex items-center text-indigo-100 hover:text-white transition-colors duration-200"
+        >
+          <i class="fas fa-sign-out-alt text-lg md:text-base"></i>
+          <span class="hidden md:inline-block ml-2 text-sm">Logout</span>
+        </a>
+
+        <!-- Mobile menu button -->
+        <button
+          type="button"
+          class="mobile-menu-button md:hidden p-2 -mr-2 rounded-md text-indigo-200 hover:text-white hover:bg-indigo-600 focus:outline-none transition-colors duration-200"
+          aria-label="Toggle menu"
+          aria-expanded="false"
+        >
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu hidden md:hidden bg-indigo-800 px-4 py-3 space-y-2">
+    <a
+      href="/admin"
+      class="mobile-nav-link block px-4 py-3 rounded-md text-indigo-100 hover:bg-indigo-700 hover:text-white transition-colors duration-200"
+    >
+      <i class="fas fa-tachometer-alt mr-3 w-5 text-center"></i> Dashboard
+    </a>
+    <a
+      href="/admin/users"
+      class="mobile-nav-link block px-4 py-3 rounded-md text-indigo-100 hover:bg-indigo-700 hover:text-white transition-colors duration-200"
+    >
+      <i class="fas fa-users mr-3 w-5 text-center"></i> Users
+    </a>
+    <a
+      href="/admin/bookings"
+      class="mobile-nav-link block px-4 py-3 rounded-md text-indigo-100 hover:bg-indigo-700 hover:text-white transition-colors duration-200"
+    >
+      <i class="fas fa-calendar-check mr-3 w-5 text-center"></i> Bookings
+    </a>
+    <a
+      href="/admin/reviews"
+      class="mobile-nav-link block px-4 py-3 rounded-md text-indigo-100 hover:bg-indigo-700 hover:text-white transition-colors duration-200"
+    >
+      <i class="fas fa-star mr-3 w-5 text-center"></i> Reviews
+    </a>
+    <div class="border-t border-indigo-700 pt-2 mt-2">
+      <a
+        href="/admin/logout"
+        class="block px-4 py-3 rounded-md text-red-200 hover:bg-indigo-700 hover:text-red-100 transition-colors duration-200"
+      >
+        <i class="fas fa-sign-out-alt mr-3 w-5 text-center"></i> Logout
+      </a>
+    </div>
+  </div>
+</nav>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const mobileMenuButton = document.querySelector(".mobile-menu-button");
+    const mobileMenu = document.querySelector(".mobile-menu");
+
+    mobileMenuButton?.addEventListener("click", function () {
+      const isExpanded = this.getAttribute("aria-expanded") === "true";
+      mobileMenu.classList.toggle("hidden");
+      this.setAttribute("aria-expanded", !isExpanded);
+
+      // Toggle icon between hamburger and close
+      const icon = this.querySelector("i");
+      if (icon) {
+        icon.classList.toggle("fa-bars");
+        icon.classList.toggle("fa-times");
+      }
+    });
+
+    // Highlight current page in navigation
+    const currentPath = window.location.pathname;
+    document.querySelectorAll(".nav-link, .mobile-nav-link").forEach((link) => {
+      if (link.getAttribute("href") === currentPath) {
+        link.classList.add("active");
+        if (link.querySelector(".nav-underline")) {
+          link.querySelector(".nav-underline").classList.add("w-full");
+        }
+      }
+    });
+  });
+</script>
+
+<style>
+  /* Add these styles to your CSS */
+  .nav-link.active {
+    @apply text-white;
+  }
+  .nav-link.active .nav-underline {
+    @apply w-full;
+  }
+  .mobile-nav-link.active {
+    @apply bg-indigo-600 text-white;
+  }
+
+  /* Smooth transitions */
+  .nav-underline {
+    transition: width 0.3s ease;
+  }
+
+  /* Better mobile menu transitions */
+  .mobile-menu {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .mobile-menu.hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+  }
+</style>

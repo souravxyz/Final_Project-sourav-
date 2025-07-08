@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .stat-card {
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+      .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+      .provider-card {
+        transition: all 0.2s ease;
+      }
+      .provider-card:hover {
+        background-color: #f8fafc;
+      }
+      .rating-stars {
+        color: #f59e0b;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- ✅ Include Header -->
+    <%- include("partials/header") %>
+
+    <div class="container mx-auto px-4 py-8">
+      <!-- ✅ Welcome Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+          <i class="fas fa-tachometer-alt text-indigo-600 mr-2"></i>
+          Welcome, <%= admin?.name || "Admin" %>
+        </h1>
+        <p class="text-gray-600 mt-2">
+          Here's what's happening on the platform today
+        </p>
+      </div>
+
+      <!-- ✅ Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="stat-card bg-white rounded-lg p-6">
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-indigo-100 text-indigo-600 mr-4">
+              <i class="fas fa-calendar-check text-xl"></i>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-500">Total Bookings</p>
+              <p class="text-2xl font-semibold text-gray-800">
+                <%= totalBookings %>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card bg-white rounded-lg p-6">
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+              <i class="fas fa-users text-xl"></i>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-500">Active Users</p>
+              <p class="text-2xl font-semibold text-gray-800">
+                <%= activeUsers || 0 %>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card bg-white rounded-lg p-6">
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+              <i class="fas fa-dollar-sign text-xl"></i>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-500">Total Revenue</p>
+              <p class="text-2xl font-semibold text-gray-800">
+                $<%= revenue ? revenue.toFixed(2) : "0.00" %>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ Top Providers -->
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+            <i class="fas fa-crown text-yellow-500 mr-2"></i> Top Service
+            Providers
+          </h2>
+        </div>
+        <div class="divide-y divide-gray-200">
+          <% if (topProviders.length > 0) { %> <%
+          topProviders.forEach(function(provider) { %>
+          <div
+            class="provider-card px-6 py-4 flex items-center justify-between"
+          >
+            <div class="flex items-center">
+              <div
+                class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center mr-4"
+              >
+                <i class="fas fa-user-tie text-purple-600"></i>
+              </div>
+              <div>
+                <h3 class="font-medium text-gray-800">
+                  <%= provider.user.name %>
+                </h3>
+                <p class="text-sm text-gray-500">
+                  <%= provider.serviceType || 'Service Provider' %>
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <div class="mr-6 text-center">
+                <span class="block text-sm text-gray-500">Rating</span>
+                <span class="font-semibold rating-stars">
+                  <%= provider.rating %> <i class="fas fa-star"></i>
+                </span>
+              </div>
+              <div class="text-center">
+                <span class="block text-sm text-gray-500">Reviews</span>
+                <span class="font-semibold"><%= provider.totalReviews %></span>
+              </div>
+            </div>
+          </div>
+          <% }); %> <% } else { %>
+          <div class="px-6 py-8 text-center text-gray-500">
+            <i class="fas fa-info-circle text-2xl mb-2"></i>
+            <p>No provider data available</p>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- ✅ Quick Links -->
+      <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <a
+          href="/admin/users"
+          class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+              <i class="fas fa-users text-xl"></i>
+            </div>
+            <div>
+              <h3 class="font-medium text-gray-800">User Management</h3>
+              <p class="text-sm text-gray-500 mt-1">
+                View and manage all users
+              </p>
+            </div>
+          </div>
+        </a>
+
+        <a
+          href="/admin/bookings"
+          class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+              <i class="fas fa-calendar-check text-xl"></i>
+            </div>
+            <div>
+              <h3 class="font-medium text-gray-800">Booking Management</h3>
+              <p class="text-sm text-gray-500 mt-1">Manage all bookings</p>
+            </div>
+          </div>
+        </a>
+
+        <a
+          href="/admin/reviews"
+          class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div class="flex items-center">
+            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+              <i class="fas fa-star text-xl"></i>
+            </div>
+            <div>
+              <h3 class="font-medium text-gray-800">Review Management</h3>
+              <p class="text-sm text-gray-500 mt-1">
+                View and moderate reviews
+              </p>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

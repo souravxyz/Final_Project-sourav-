@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookings Management</title>
+ <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #3498db;
+      --secondary-color: #2c3e50;
+      --success-color: #2ecc71;
+      --warning-color: #f39c12;
+      --danger-color: #e74c3c;
+      --light-color: #ecf0f1;
+      --dark-color: #2c3e50;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+    }
+    
+    .search-filter-container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+    
+    .search-input {
+      border-radius: 20px;
+      padding-left: 15px;
+      border: 1px solid #ddd;
+      transition: all 0.3s;
+    }
+    
+    .search-input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+    }
+    
+    .status-select {
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    
+    .filter-btn {
+      border-radius: 20px;
+      background-color: var(--primary-color);
+      border: none;
+      padding: 8px 20px;
+      transition: all 0.3s;
+    }
+    
+    .filter-btn:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px);
+    }
+    
+    .booking-table {
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .booking-table thead {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .booking-table th {
+      padding: 15px;
+      font-weight: 500;
+    }
+    
+    .booking-table td {
+      padding: 12px 15px;
+      vertical-align: middle;
+    }
+    
+    .status-badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .status-pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-confirmed {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+    
+    .status-completed {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .status-cancelled {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    .action-form {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .action-select {
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      padding: 5px;
+      font-size: 0.9rem;
+    }
+    
+    .update-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    
+    .update-btn:hover {
+      background-color: #2980b9;
+    }
+    
+    .no-bookings {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+    }
+    
+    .email-text {
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+    
+    .deleted-provider {
+      color: #6c757d;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <%- include("partials/header") %>
+  
+  <div class="container-fluid py-4">
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="mb-0"><i class="fas fa-calendar-check me-2"></i>All Bookings</h2>
+          <div>
+            <a href="/admin" class="btn btn-outline-secondary">
+              <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+            </a>
+          </div>
+        </div>
+        
+        <!-- Flash Messages -->
+        <% if (messages.error) { %>
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i><%= messages.error %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% } %>
+        
+        <% if (messages.success) { %>
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i><%= messages.success %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% } %>
+        
+        <!-- Search and Filter Form -->
+        <form method="GET" action="/admin/bookings" class="search-filter-container">
+          <div class="row g-3 align-items-center">
+            <div class="col-md-5">
+              <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                  <i class="fas fa-search text-muted"></i>
+                </span>
+                <input 
+                  type="text" 
+                  name="search" 
+                  class="form-control search-input border-start-0" 
+                  placeholder="Search user or provider..." 
+                  value="<%= search || '' %>"
+                >
+              </div>
+            </div>
+            <div class="col-md-4">
+              <select name="status" class="form-select status-select">
+                <option value="all" <%= selectedStatus === 'all' ? 'selected' : '' %>>All Statuses</option>
+                <option value="pending" <%= selectedStatus === 'pending' ? 'selected' : '' %>>Pending</option>
+                <option value="confirmed" <%= selectedStatus === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
+                <option value="completed" <%= selectedStatus === 'completed' ? 'selected' : '' %>>Completed</option>
+                <option value="cancelled" <%= selectedStatus === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <button type="submit" class="btn btn-primary w-100 filter-btn">
+                <i class="fas fa-filter me-1"></i> Filter
+              </button>
+            </div>
+          </div>
+        </form>
+        
+        <!-- Bookings Table -->
+        <div class="booking-table">
+          <% if (bookings.length > 0) { %>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Provider</th>
+                    <th>Date & Time</th>
+                    <th>Service</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% bookings.forEach(b => { %>
+                  <tr>
+                    <td>
+                      <div class="fw-medium"><%= b.userId?.name %></div>
+                      <div class="email-text"><%= b.userId?.email %></div>
+                    </td>
+                    <td>
+                      <% if (b.providerId && b.providerId.user) { %>
+                        <div class="fw-medium"><%= b.providerId.user.name %></div>
+                        <div class="email-text"><%= b.providerId.user.email %></div>
+                      <% } else { %>
+                        <span class="deleted-provider">Provider Deleted</span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <div class="fw-medium"><%= new Date(b.date).toLocaleDateString() %></div>
+                      <div><%= b.time %></div>
+                    </td>
+                    <td><%= b.service %></td>
+                    <td>$<%= b.price.toFixed(2) %></td>
+                    <td>
+                      <span class="status-badge status-<%= b.status %>">
+                        <%= b.status.charAt(0).toUpperCase() + b.status.slice(1) %>
+                      </span>
+                    </td>
+                    <td>
+                      <form class="action-form" action="/admin/bookings/<%= b._id %>/status" method="POST">
+                        <select name="status" class="action-select">
+                          <option value="pending" <%= b.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                          <option value="confirmed" <%= b.status === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
+                          <option value="completed" <%= b.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                          <option value="cancelled" <%= b.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                        </select>
+                        <button type="submit" class="update-btn">
+                          <i class="fas fa-sync-alt"></i>
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="no-bookings">
+              <i class="fas fa-calendar-times fa-3x mb-3"></i>
+              <h4>No Bookings Found</h4>
+              <p class="text-muted">Try adjusting your search or filter criteria</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Auto-dismiss flash messages after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+          var bsAlert = new bootstrap.Alert(alert);
+          bsAlert.close();
+        });
+      }, 5000);
+    });
+  </script>
+</body>
+</html>

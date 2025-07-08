@@ -1,0 +1,9 @@
+<!-- src/assets/logo.svg -->
+<svg width="160" height="40" viewBox="0 0 160 40" xmlns="http://www.w3.org/2000/svg">
+  <text x="0" y="28" font-family="Segoe UI, sans-serif" font-size="24" fill="#4F46E5" font-weight="600">
+    ⚡ Nexus
+  </text>
+  <text x="85" y="28" font-family="Segoe UI, sans-serif" font-size="24" fill="#9333EA" font-weight="600">
+    Serve
+  </text>
+</svg>

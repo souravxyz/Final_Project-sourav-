@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reviews Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .star-rating {
+      display: inline-flex;
+      align-items: center;
+      background-color: #f8f4ff;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+    }
+    
+    .star-rating-5 { color: #16a34a; background-color: #f0fdf4; }
+    .star-rating-4 { color: #22c55e; background-color: #f0fdf4; }
+    .star-rating-3 { color: #f59e0b; background-color: #fffbeb; }
+    .star-rating-2 { color: #f97316; background-color: #fff7ed; }
+    .star-rating-1 { color: #ef4444; background-color: #fef2f2; }
+    
+    .comment-cell {
+      max-width: 300px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .comment-cell:hover {
+      white-space: normal;
+      overflow: visible;
+      position: relative;
+      z-index: 10;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 0.375rem;
+      padding: 1rem;
+    }
+    
+    .flash-message {
+      animation: fadeInOut 5s forwards;
+    }
+    
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(-10px); }
+      10% { opacity: 1; transform: translateY(0); }
+      90% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <%- include("partials/header") %>
+  
+  <div class="container mx-auto px-4 py-8">
+    <!-- Flash Messages -->
+    <% if (messages.error) { %>
+      <div class="flash-message bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+        <div class="flex items-center">
+          <i class="fas fa-exclamation-circle mr-2"></i>
+          <span><%= messages.error %></span>
+        </div>
+      </div>
+    <% } %>
+    
+    <% if (messages.success) { %>
+      <div class="flash-message bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded">
+        <div class="flex items-center">
+          <i class="fas fa-check-circle mr-2"></i>
+          <span><%= messages.success %></span>
+        </div>
+      </div>
+    <% } %>
+
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">
+          <i class="fas fa-star mr-2 text-yellow-500"></i> Customer Reviews
+        </h2>
+        <div class="mt-4 md:mt-0">
+          <a href="/admin" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+          </a>
+        </div>
+      </div>
+
+      <form method="GET" action="/admin/reviews" class="mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <div class="relative rounded-md shadow-sm">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
+              </div>
+              <input
+                type="text"
+                name="search"
+                id="search"
+                placeholder="User or provider name"
+                value="<%= search || '' %>"
+                class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md"
+              >
+            </div>
+          </div>
+          
+          <div>
+            <label for="rating" class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
+            <select
+              id="rating"
+              name="rating"
+              class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md"
+            >
+              <option value="all" <%= selectedRating === 'all' ? 'selected' : '' %>>All Ratings</option>
+              <option value="5" <%= selectedRating === '5' ? 'selected' : '' %>>5 Stars</option>
+              <option value="4" <%= selectedRating === '4' ? 'selected' : '' %>>4 Stars</option>
+              <option value="3" <%= selectedRating === '3' ? 'selected' : '' %>>3 Stars</option>
+              <option value="2" <%= selectedRating === '2' ? 'selected' : '' %>>2 Stars</option>
+              <option value="1" <%= selectedRating === '1' ? 'selected' : '' %>>1 Star</option>
+            </select>
+          </div>
+          
+          <div class="flex items-end">
+            <button
+              type="submit"
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              <i class="fas fa-filter mr-2"></i> Apply Filters
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div class="overflow-x-auto">
+        <% if (reviews.length > 0) { %>
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  User
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Provider
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Rating
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Review
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% reviews.forEach(r => { %>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <i class="fas fa-user text-indigo-600"></i>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900"><%= r.userId?.name %></div>
+                        <div class="text-sm text-gray-500"><%= r.userId?.email %></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <% if (r.providerId && r.providerId.user) { %>
+                      <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                          <i class="fas fa-user-tie text-purple-600"></i>
+                        </div>
+                        <div class="ml-4">
+                          <div class="text-sm font-medium text-gray-900"><%= r.providerId.user.name %></div>
+                          <div class="text-sm text-gray-500"><%= r.providerId.user.email %></div>
+                        </div>
+                      </div>
+                    <% } else { %>
+                      <div class="text-sm text-gray-400 italic">Provider deleted</div>
+                    <% } %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="star-rating star-rating-<%= r.rating %> px-3 py-1 rounded-full text-sm font-semibold">
+                      <%= r.rating %> ★
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 comment-cell">
+                    <div class="text-sm text-gray-700"><%= r.comment || 'No comment provided' %></div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <%= r.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <form method="POST" action="/admin/reviews/<%= r._id %>/delete" onsubmit="return confirm('Are you sure you want to delete this review?');">
+                      <button type="submit" class="text-red-600 hover:text-red-900">
+                        <i class="fas fa-trash-alt mr-1"></i> Delete
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } else { %>
+          <div class="text-center py-12">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 mb-4">
+              <i class="fas fa-star text-gray-400"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-1">No reviews found</h3>
+            <p class="text-gray-500">Try adjusting your search or filter criteria</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Auto-dismiss flash messages after animation completes
+    document.addEventListener('DOMContentLoaded', function() {
+      const flashMessages = document.querySelectorAll('.flash-message');
+      flashMessages.forEach(message => {
+        setTimeout(() => {
+          message.remove();
+        }, 5000);
+      });
+    });
+  </script>
+</body>
+</html>
