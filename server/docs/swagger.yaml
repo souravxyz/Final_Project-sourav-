@@ -5,7 +5,7 @@ info:
   description: API documentation for Final Project (Sourav)
 
 servers:
-  - url: http://localhost:6900
+  - url: https://final-project-sourav-server.onrender.com
 
 tags:
   - name: Auth
