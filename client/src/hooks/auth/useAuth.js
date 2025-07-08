@@ -10,6 +10,7 @@ import {
   resetPasswordWithToken,
 } from "../../api/apiHandler";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 // 🔐 Register user
 export const useRegister = () => {
@@ -82,12 +83,17 @@ export const useResetPasswordWithToken = () => {
 
 // 🚪 Logout user
 export const useLogout = () => {
+  const navigate = useNavigate();
+
   return useMutation({
     mutationFn: logoutUser,
     onSuccess: () => {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      window.location.href = "/login";
+      navigate("/login");
+    },
+    onError: (err) => {
+      console.error("Logout failed:", err);
     },
   });
 };
