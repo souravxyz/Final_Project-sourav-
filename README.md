@@ -14,7 +14,7 @@ This app was built by a team including backend developers, frontend (React) devs
 ## 🚀 Live API Docs
 
 API documentation (Swagger) is available locally at:
-[http://localhost:6900/api-docs](http://localhost:6900/api-docs)
+[https://final-project-sourav-server.onrender.com/api-docs](https://final-project-sourav-server.onrender.com/api-docs)
 
 ---
 
@@ -100,7 +100,7 @@ The following routes are documented in Swagger:
 ✅ Review (create, list)  
 ✅ Analytics
 
-Swagger URL: [http://localhost:6900/api-docs](http://localhost:6900/api-docs)
+Swagger URL: [https://final-project-sourav-server.onrender.com/api-docs](https://final-project-sourav-server.onrender.com/api-docs)
 
 ---
 
@@ -112,7 +112,7 @@ cd server
 npm install
 npm run dev
 
-# Server runs on: http://localhost:6900
+# Server runs on: https://final-project-sourav-server.onrender.com
 
 # Install and run the frontend
 

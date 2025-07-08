@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:6900/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "https://final-project-sourav-server.onrender.com/api",
 });
 
 // Optional: attach token from localStorage
