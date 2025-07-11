@@ -3,6 +3,10 @@ import { useLogout, useUserProfile } from "../hooks/auth/useAuth";
 import { getImageUrl } from "../utils/getImageUrl";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  FiPlus,
+  FiMessageSquare,
+  FiHelpCircle,
+  FiCreditCard,
   FiLogOut,
   FiSearch,
   FiCalendar,
@@ -86,11 +90,11 @@ export default function Navbar() {
       icon: <FiCalendar className="text-emerald-400" />,
       text: "My Bookings",
     },
-      {
-    to: "/my-reviews",
-    icon: <FiStar className="text-yellow-400" />,
-    text: "My Reviews",
-  },
+    {
+      to: "/my-reviews",
+      icon: <FiStar className="text-yellow-400" />,
+      text: "My Reviews",
+    },
   ];
 
   const providerLinks = [
@@ -359,71 +363,134 @@ function MobileMenu({
   return (
     <AnimatePresence>
       {mobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-          className="fixed top-16 left-0 right-0 z-40 bg-gray-900/95 backdrop-blur-lg border-b border-gray-700/50 shadow-lg md:hidden"
-        >
-          <div className="px-4 py-3 flex flex-col gap-4">
-            {(user.role === "customer" ? customerLinks : providerLinks).map(
-              (link) => (
-                <motion.div
-                  key={link.to}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full"
-                >
-                  <Link
-                    to={link.to}
-                    className="flex items-center gap-3 text-gray-300 hover:text-white p-3 rounded-lg hover:bg-gray-800/50 transition-colors"
-                    onClick={closeAllMenus}
-                  >
-                    {link.icon}
-                    <span>{link.text}</span>
-                  </Link>
-                </motion.div>
-              )
-            )}
+        <>
+          {/* Overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm"
+            onClick={closeAllMenus}
+          />
 
-            {/* Profile Edit Links in Mobile Menu */}
-            {profileMenuItems.map((item) => (
-              <motion.div
-                key={item.to}
-                whileTap={{ scale: 0.98 }}
-                className="w-full"
-              >
-                <Link
-                  to={item.to}
-                  className="flex items-center gap-3 text-gray-300 hover:text-white p-3 rounded-lg hover:bg-gray-800/50 transition-colors"
-                  onClick={closeAllMenus}
-                >
-                  {item.icon}
-                  <span>{item.text}</span>
-                </Link>
-              </motion.div>
-            ))}
-
-            {/* Mobile User Info */}
-            <div className="border-t border-gray-700/50 pt-3 mt-2 flex items-center justify-between">
-              <div className="flex items-center gap-3">
+          {/* Menu Content */}
+          <motion.div
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            className="fixed top-0 left-0 bottom-0 z-50 w-80 max-w-full bg-gray-900 border-r border-gray-700/50 shadow-2xl overflow-y-auto"
+          >
+            {/* User Profile Section */}
+            <div className="p-6 bg-gradient-to-b from-gray-800 to-gray-900 border-b border-gray-700/50">
+              <div className="flex items-center gap-4">
                 <img
                   src={getImageUrl(user?.profilePic)}
                   alt="Profile"
-                  className="w-10 h-10 rounded-full border-2 border-purple-500/50 object-cover"
+                  className="w-14 h-14 rounded-full border-2 border-purple-500/70 object-cover"
                 />
-                <span className="text-gray-200 font-medium">{user.name}</span>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">
+                    {user.name}
+                  </h3>
+                  <p className="text-sm text-gray-400 capitalize">
+                    {user.role}
+                  </p>
+                </div>
               </div>
+            </div>
+
+            {/* Main Navigation */}
+            <div className="p-4 space-y-1">
+              {(user.role === "customer" ? customerLinks : providerLinks).map(
+                (link) => (
+                  <motion.div key={link.to} whileTap={{ scale: 0.98 }}>
+                    <Link
+                      to={link.to}
+                      className="flex items-center gap-4 px-4 py-3 text-gray-300 hover:text-white rounded-lg hover:bg-gray-800/50 transition-colors"
+                      onClick={closeAllMenus}
+                    >
+                      <span className="text-xl">{link.icon}</span>
+                      <span className="text-base">{link.text}</span>
+                    </Link>
+                  </motion.div>
+                )
+              )}
+            </div>
+
+            {/* Quick Actions (Customer Only) */}
+            {user.role === "customer" && (
+              <div className="px-4 py-3 border-t border-gray-700/50">
+                <h4 className="text-xs uppercase text-gray-500 mb-2 px-4">
+                  Quick Actions
+                </h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <Link
+                    to="/customer/new-request"
+                    className="flex flex-col items-center justify-center p-3 bg-gray-800/50 rounded-lg hover:bg-purple-500/10 transition-colors"
+                    onClick={closeAllMenus}
+                  >
+                    <FiPlus className="text-purple-400 text-xl mb-1" />
+                    <span className="text-xs text-gray-300">New Request</span>
+                  </Link>
+                  <Link
+                    to="/messages"
+                    className="flex flex-col items-center justify-center p-3 bg-gray-800/50 rounded-lg hover:bg-blue-500/10 transition-colors"
+                    onClick={closeAllMenus}
+                  >
+                    <FiMessageSquare className="text-blue-400 text-xl mb-1" />
+                    <span className="text-xs text-gray-300">Messages</span>
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {/* Account Section */}
+            <div className="p-4 border-t border-gray-700/50">
+              <h4 className="text-xs uppercase text-gray-500 mb-2 px-4">
+                Account
+              </h4>
+              <div className="space-y-1">
+                {profileMenuItems.map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className="flex items-center gap-4 px-4 py-3 text-gray-300 hover:text-white rounded-lg hover:bg-gray-800/50 transition-colors"
+                    onClick={closeAllMenus}
+                  >
+                    <span className="text-xl">{item.icon}</span>
+                    <span className="text-base">{item.text}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Support & Logout */}
+            <div className="p-4 border-t border-gray-700/50">
+              <Link
+                to="/support"
+                className="flex items-center gap-4 px-4 py-3 text-gray-300 hover:text-white rounded-lg hover:bg-gray-800/50 transition-colors"
+                onClick={closeAllMenus}
+              >
+                <FiHelpCircle className="text-xl text-amber-400" />
+                <span className="text-base">Help & Support</span>
+              </Link>
               <button
                 onClick={handleLogout}
-                className="text-red-400 p-2 rounded-full hover:bg-gray-800/50 transition-colors"
-                aria-label="Logout"
+                className="flex items-center gap-4 w-full px-4 py-3 text-red-400 hover:bg-gray-800/50 rounded-lg transition-colors"
               >
-                <FiLogOut />
+                <FiLogOut className="text-xl" />
+                <span className="text-base">Logout</span>
               </button>
             </div>
-          </div>
-        </motion.div>
+
+            {/* App Version */}
+            <div className="p-4 text-center text-xs text-gray-500">
+              NexusServe v1.0.0
+            </div>
+          </motion.div>
+        </>
       )}
     </AnimatePresence>
   );
