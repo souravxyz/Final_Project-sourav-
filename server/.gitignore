@@ -1,5 +1,2 @@
-# Ignore uploaded images
-uploads/
-
 # Ignore environment variables
 .env
