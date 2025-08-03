@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */ // Disable unused vars lint rule for this file
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { FiLogIn, FiUserPlus, FiHome } from "react-icons/fi";

@@ -1,7 +1,9 @@
+/* eslint-disable no-unused-vars */ // Disable unused vars lint rule for this file
+import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useLogout, useUserProfile } from "../hooks/auth/useAuth";
 import { getImageUrl } from "../utils/getImageUrl";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import {
   FiPlus,
   FiMessageSquare,
@@ -103,7 +105,6 @@ export default function Navbar() {
       icon: <FiHome className="text-green-400" />,
       text: "Home",
     },
-
     {
       to: "/provider/dashboard",
       icon: <FiHome className="text-blue-400" />,
@@ -164,7 +165,7 @@ export default function Navbar() {
 
           {/* Desktop Navigation Links */}
           <ul className="hidden md:flex items-center gap-6">
-            {(user.role === "customer" ? customerLinks : providerLinks).map(
+            {(user?.role === "customer" ? customerLinks : providerLinks).map(
               (link) => (
                 <motion.li key={link.to} whileHover={{ scale: 1.05 }}>
                   <Link
@@ -220,7 +221,7 @@ function LogoSection({ user, navigate, logoHover, setLogoHover }) {
       className="flex items-center gap-2 cursor-pointer"
       onClick={() =>
         navigate(
-          user.role === "customer"
+          user?.role === "customer"
             ? "/customer/dashboard"
             : "/provider/dashboard"
         )
@@ -287,6 +288,9 @@ function UserProfileSection({
   profileMenuItems,
   handleLogout,
 }) {
+  // Return null if user is not available
+  if (!user) return null;
+
   return (
     <motion.div className="flex items-center gap-4 relative">
       <div className="hidden md:flex items-center gap-2">
